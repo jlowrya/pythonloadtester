@@ -112,14 +112,21 @@ class TestCoordinator:
     @property
     def latency_99(self):
         return quantiles(self.latencies, n=100)[98]
-        
-coordinator = TestCoordinator(50, 30)
-start = time.time()
-coordinator.run_tests("http://localhost:8080/test-api-main-endpoint")
-print(f"Finished processing {coordinator.total_requests} requests in {time.time()-start} seconds")
-print(f"Status code counts: {coordinator.status_counts}")
-print(f"Median latency: {coordinator.latency_median} seconds")
-print(f"95 latency: {coordinator.latency_95} seconds")
-print(f"99 latency: {coordinator.latency_99} seconds")
-print(f"Throughput is {coordinator.throughput} QPS and a success rate of {round(coordinator.num_successful/coordinator.total_requests*100)} %")
+
+run = True
+
+while run:
+    threads = int(input("How many threads would you like to use?"))
+    seconds = int(input("How many seconds would you like to run the test for?"))
+    coordinator = TestCoordinator(threads, seconds)
+    start = time.time()
+    coordinator.run_tests("http://localhost:8080/test-api-main-endpoint")
+    print(f"Finished processing {coordinator.total_requests} requests in {time.time()-start} seconds")
+    print(f"Status code counts: {coordinator.status_counts}")
+    print(f"Median latency: {coordinator.latency_median} seconds")
+    print(f"95 latency: {coordinator.latency_95} seconds")
+    print(f"99 latency: {coordinator.latency_99} seconds")
+    print(f"Throughput is {coordinator.throughput} QPS and a success rate of {round(coordinator.num_successful/coordinator.total_requests*100)} %")
+    resp = input("Would you like to run another test (y/n)?").lower()
+    run = resp=="y"
 
