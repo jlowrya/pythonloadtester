@@ -2,6 +2,7 @@ import time
 import requests
 from threading import current_thread, local
 import concurrent.futures
+from statistics import quantiles
 from typing import NamedTuple
 
 Response = NamedTuple("Response", [("code", int), ("latency", float)])
@@ -99,12 +100,26 @@ class TestCoordinator:
     @property
     def num_failed(self):
         return sum([test.num_failed for test in self.tests])
+    
+    @property
+    def latency_median(self):
+        return quantiles(self.latencies, n=100)[49]
+    
+    @property
+    def latency_95(self):
+        return quantiles(self.latencies, n=100)[94]
+
+    @property
+    def latency_99(self):
+        return quantiles(self.latencies, n=100)[98]
         
 coordinator = TestCoordinator(50, 30)
 start = time.time()
 coordinator.run_tests("http://localhost:8080/test-api-main-endpoint")
 print(f"Finished processing {coordinator.total_requests} requests in {time.time()-start} seconds")
 print(f"Status code counts: {coordinator.status_counts}")
+print(f"Median latency: {coordinator.latency_median} seconds")
+print(f"95 latency: {coordinator.latency_95} seconds")
+print(f"99 latency: {coordinator.latency_99} seconds")
 print(f"Throughput is {coordinator.throughput} QPS and a success rate of {round(coordinator.num_successful/coordinator.total_requests*100)} %")
-
 
