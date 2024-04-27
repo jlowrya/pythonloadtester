@@ -112,12 +112,27 @@ class TestCoordinator:
     @property
     def latency_99(self):
         return quantiles(self.latencies, n=100)[98]
+    
 
 run = True
 
 while run:
-    threads = int(input("How many threads would you like to use?"))
-    seconds = int(input("How many seconds would you like to run the test for?"))
+    threads = None
+    while threads is None:
+        try:
+            threads = int(input("How many threads would you like to use?"))
+        except ValueError:
+            print("Invalid number provided. Please provide a valid integer for the number of threads to use")
+
+    seconds = None
+    while seconds is None:
+        try:
+            seconds = int(input("How many seconds would you like to run the test for?"))
+        except ValueError:
+            print("Invalid number provided. Please provide a valid integer for the number of seconds to run the program for.")
+
+
+    
     coordinator = TestCoordinator(threads, seconds)
     start = time.time()
     coordinator.run_tests("http://localhost:8080/test-api-main-endpoint")
@@ -127,6 +142,10 @@ while run:
     print(f"95 latency: {coordinator.latency_95} seconds")
     print(f"99 latency: {coordinator.latency_99} seconds")
     print(f"Throughput is {coordinator.throughput} QPS and a success rate of {round(coordinator.num_successful/coordinator.total_requests*100)} %")
+
     resp = input("Would you like to run another test (y/n)?").lower()
+    while resp not in ("y", "n"):
+        resp = input("Invalid option. Would you like to run another test (y/n)?").lower()
+        
     run = resp=="y"
 
