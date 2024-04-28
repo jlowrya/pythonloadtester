@@ -27,3 +27,7 @@ Basic input validation is performed when inputting the number of threads, second
 When developing this program, I took the requirement of "control the number of concurrent requests" to mean control the number of threads used. This seemed to make the most sense when coupled with the requirement to run in a specific duration.
 
 As well, I am manually printing out the various statistics required, although that could probably be consolidated into methods of their own.
+
+## Recommend run settings
+
+To start seeing a decent number of failed requests, I ran the program with **50 concurrent threads for 30 seconds**. In my tests, this normally resulted in a 95% success rate.
